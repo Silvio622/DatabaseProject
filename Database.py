@@ -50,15 +50,11 @@ def view_actors():
                 actors = cursor.fetchall() # create a variable with returns all rows from the database into it
                 return actors 
                 break     
-
-
-    
-    
-    
+ 
+      
 
 # Menu 3 View Studios
 def view_studios():
-    #print("choice 3")
     if not conn:
         #print("No Connection")
         connect() # call the connect function to connect to the database 
@@ -78,6 +74,54 @@ def view_studios():
         print(studio["StudioID"], "|",studio["StudioName"])
         studio["StudioID"], "|",studio["StudioName"]
     '''   
+# Menu 4 Add New Country
+def add_country():
+    global countryid
+    global countryname
+    try:
+        countryid = int(input("ID : "))
+    except ValueError:
+        add_country()
+    
+    while True:
+        countryname = input("Name : ")
+        if countryname != "":
+            break
+    
+
+    if not conn:
+        connect() # call the connect function to connect to the database 
+    
+    query = "INSERT INTO country (CountryID, CountryName) VALUES (%s,%s)"
+
+    with conn: # close the connection
+        try:
+            cursor = conn.cursor() # this returns a cursor object
+            cursor.execute(query,(countryid,countryname))
+            conn.commit()
+            print("")
+            print("Country: {} , {} added to database".format(countryid,countryname))
+
+        except pymysql.err.IntegrityError:
+            print("")
+            print("*** ERROR ***: ID and/or Name ({} , {}) already exist".format(countryid,countryname))
+
+
+# Menu 5 View Movies with Subtitles
+def view_movies():
+    subtitle = input("Enter subtitle language: ")
+    if subtitle == "":
+        view_movies()
+        print(subtitle)
+    else:
+        print("choice 5")
+
+        
+
+
+        
+
+
 
 
 def main():  
@@ -119,9 +163,17 @@ def display_Choice():
             print(studio["StudioID"], "¦",studio["StudioName"]) 
         
     elif choice == "4":
-        print("choice 4")
+        print("Add New Country")
+        print("---------------")
+        add_country()
+        
+        
     elif choice == "5":
-        print("choice 5")
+        print("Movies with Subtitles")
+        print("---------------------")
+        view_movies()
+
+        
     elif choice == "6":
         print("choice 6")
     elif choice == "x":
