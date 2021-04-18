@@ -1,0 +1,7 @@
+SELECT ge.genrename, count(*)
+FROM genre ge
+LEFT JOIN film fm
+ON ge.GenreID = fm.FilmgenreID
+WHERE ge.GenreID = fm.FilmgenreID
+GROUP BY ge.GenreName
+ORDER BY ge.GenreName;

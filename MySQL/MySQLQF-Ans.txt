@@ -1,0 +1,14 @@
+SELECT di.DirectorName ,lan.language
+
+FROM film fm
+INNER JOIN language lan
+
+ON fm.FilmLanguageID = lan.LanguageID
+
+INNER JOIN director di
+
+ON fm.FilmDirectorID = di.DirectorID
+
+WHERE fm.FilmLanguageID != 1
+
+ORDER BY DirectorName;
