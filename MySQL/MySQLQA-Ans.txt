@@ -1,3 +1,13 @@
-filmname	countryname
-Once Were Warriors	New Zealand
-Harry Potter and the Goblet of Fire	United Kingdom
+SELECT fm.filmname, cn.countryname
+FROM film fm
+INNER JOIN filmcast fmca
+ON fm.FilmID = fmca.CastFilmID
+INNER JOIN actor ac
+ON fmca.CastActorID = ac.ActorID
+INNER JOIN director di
+ON fm.FilmDirectorID = di.DirectorID
+INNER JOIN country cn
+ON di.DirectorCountryID = cn.CountryID
+WHERE (di.DirectorCountryID = ac.ActorCountryID) AND ac.ActorCountryID != 241
+GROUP BY cn.CountryName
+ORDER BY cn.CountryName;
