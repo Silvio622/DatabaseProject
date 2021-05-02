@@ -1,4 +1,5 @@
-
+# Project for Applied Databases
+# Author: Silvio Dunst
 
 import pymysql
 import datetime
@@ -134,10 +135,7 @@ myclient = None
 
 def mongo_connect():
     global myclient
-    print("In mongo_connect()")
-    print("1",myclient)
     myclient = pymongo.MongoClient(host="localhost",port=27017) # connect to the Mongo deamon
-    print("2",myclient)
     myclient.admin.command("ismaster")
 
 
@@ -148,14 +146,11 @@ def mongo_find():
     querymongo = {"subtitles": subtitle}# read out the attribute "subtitle" in the Mongo database collection
     dbsubtitles = docs.find(querymongo)
         
-    #print(dbsubtitles)
-
+    
     for sub in dbsubtitles:
-        #print(sub["_id"])
         moviesid = []
         moviesid = sub["_id"]
-        #print (moviesid)
-        
+                
         global conn # make the variable "conn" global to see it in all functions
         conn = pymysql.connect(host="localhost", user="root", password="root", port=3306, db="moviesdb", cursorclass=pymysql.cursors.DictCursor)
         
@@ -170,38 +165,9 @@ def mongo_find():
             films = cursor.fetchall() # create a variable with returns all rows from the database into it
 
         for film in films:
-            #filmlist = filmlist.append(film["FilmName"],"¦",film["FilmSynopsis"])
-            #filmlist = filmlist.append(film)
-            #print(filmlist)
             print(film["FilmName"],"¦",film["FilmSynopsis"][0:30])# print only a length of 30 string characters
 
-    '''
-    for ids in moviesid:                       
-        if not conn:
-            connect() # call the connect function to connect to the SQL database 
-        
-        querysql = "SELECT FilmName, FilmSynopsis FROM film WHERE FilmId = %s "
-
-        with conn: # close the connection
-                    cursor = conn.cursor() # this returns a cursor object
-                    cursor.execute(querysql,(ids))  # execute the query variable and pass in "number" in the placeholder %s. number comes from the parameter what is passed in in the function
-                    #cursor.execute(querysql,(moviesid))  # execute the query variable and pass in "number" in the placeholder %s. number comes from the parameter what is passed in in the function
-                    films = cursor.fetchall() # create a variable with returns all rows from the database into it
-
-        for film in films:
-            print(film["FilmName"],"¦",film["FilmSynopsis"])
-    '''
-
-    '''
-    mydb = myclient["w10"]# create a variable "mydb" connecto the the database "w10"
-    docs = mydb["docs"]# create a variable docs and put in the collection/table docs from w10 database
-    query = {"address":"Dublin"} # importent to put the column "address" in quotation marks otherwise we get an error
-    poeple = docs.find(query)# cretae a variable poeple and put in the docs.find method and put in the query variable
-    print (poeple)
-    for p in poeple: # loops through the variable poeple and print out every element(database intry) 
-        print(p["name"],"|",p["age"])# type in the column name and age only 
-       # print(p["name"],"|",int(p["age"]))# type in the column name and age only but convert the age to an integer 5
-    '''
+    
 
 # Menu 5 View Movies with Subtitles
 def view_movies():
@@ -210,7 +176,6 @@ def view_movies():
     subtitle = input("Enter subtitle language: ")
     if subtitle == "":
         view_movies()
-        #print(subtitle)
         subtitle = ""
         
     else:
@@ -218,14 +183,10 @@ def view_movies():
             try:
                 mongo_connect()# connect to the database
                 mongo_find()
-                #subtitle = None
+                
             except Exception as e:
                 print("Error", e)
-                #subtitle = None
-    #subtitle = None
-        #print("choice 5")
-    #myclient.close_cursor()
-    #myclient.close()
+                    
 
 def mongo_insert():
     db = myclient["movieScriptsDB"]# call the database
@@ -239,12 +200,7 @@ def mongo_insert():
 
     except Exception as e:
         print("Error",e)
-
-    print(newmoviedic)
-    #print(keywordslist)
-    #print(subtitleslist)           
-    
-
+            
 
 # Menu 6 Add New Movie Script
 def new_movie():
@@ -303,34 +259,29 @@ def new_movie():
             cursor.execute(queryfm,(newmovieid))
             conn.commit()
             checkfilmid = cursor.fetchone() # returns the filmid if it exist if it not exists it returns None
-            #checkfilmid = cursor.fetchall() # create a variable with returns all rows from the database into it
-                #return actors
-            #print("")
-            #print("Country: {} , {} added to database".format(countryid,countryname))
-            print("checkfilmid",checkfilmid)
+                        
         except pymysql.err.IntegrityError as e:
-            print("")
-            print("*** ERROR ***: Film with id: {} does not exist in moviesDB".format(checkfilmid))
+            print("*** Error ***:",e)
+                        
 
+    if checkfilmid == None:# the filmid does not exist in the movieDB SQL Database
+        print("")
+        print("*** ERROR ***: Film with id: {} does not exist in moviesDB".format(newmovieid))
+        return checkfilmid
 
-               
+    elif checkfilmid != None:
+        checkfilmid = checkfilmid
+                   
 
     # Connect to Mongo Database 
     if not myclient:# if no connections are made
         try:
             mongo_connect()# connect to the database
             mongo_insert()
-            #mongo_find()
-            #subtitle = None
         except Exception as e:
             print("Error", e)
      
-    
-    
-
-
-        
-
+   
 
 studiocount = 0
 
@@ -346,9 +297,9 @@ def display_Choice():
         print("")
     else:
         print("Invalid Input Please try again!")
-        #display_Choice()
-        main()
-        #display_Menu()
+        
+        main() # Return to main() menu
+        
 
     if choice == "1":
         print("Films")
@@ -415,10 +366,8 @@ def display_Choice():
                     #break
                 #count = count + 1 
 
-        main() # Return to main() menu           
-        
-
-        
+        main() # Return to main() menu                 
+       
 
     elif choice == "2":
         print("Actors")
@@ -448,7 +397,8 @@ def display_Choice():
         else: # runs from the second call onwards
             for studio in studios:# loop trough the studios variable and seperate the dictionaries with column header StudioID and StudioName
                 print(studio["StudioID"], "¦",studio["StudioName"])
-            
+
+        print("")    
         main() # Return to main() menu 
 
 
@@ -456,17 +406,16 @@ def display_Choice():
         print("Add New Country")
         print("---------------")
         add_country()
+
+        print("") 
         main() # Return to main() menu 
 
         
     elif choice == "5":
-        #global subtitle 
         print("Movies with Subtitles")
         print("---------------------")
         view_movies()
-        #subtitle = ""
-        #display_Menu()
-        #global subtitle 
+        
         print("")
         main() # Return to main() menu 
         
@@ -475,9 +424,9 @@ def display_Choice():
         print("Add New Movie Script")
         print("--------------------")
         new_movie()
-        
-        print("choice 6")
-        print("moviesid")
+                
+        print("")
+        main() # Return to main() menu 
         
 
     elif choice == "x":
@@ -485,7 +434,7 @@ def display_Choice():
         exit()
     else:
         display_Menu()
-        #main() # Return to main() menu 
+        
 
 def display_Menu():
     print("Movies DB")
